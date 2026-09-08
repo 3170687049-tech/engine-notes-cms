@@ -361,7 +361,15 @@ def build() -> None:
     base_tpl = tpl("base.html")
 
     posts = []
+    # 扫描 content/*.md（现有 7 篇 + _about）
     for md_file in sorted(CONTENT.glob("*.md")):
+        if md_file.name.startswith("_"):
+            continue
+        p = parse_post(md_file)
+        if p:
+            posts.append(p)
+    # 同时扫描仓库根目录的 posts/*.md（Sveltia CMS 写入位置）
+    for md_file in sorted((ROOT / "posts").glob("*.md")):
         if md_file.name.startswith("_"):
             continue
         p = parse_post(md_file)
