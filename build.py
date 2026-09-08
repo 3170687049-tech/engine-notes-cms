@@ -408,12 +408,23 @@ def build() -> None:
 
     for p in posts:
         if p["cover"]:
-            src = ASSETS / p["cover"]
+            # cover 有两种写法：
+            #   - 老文章: covers/foo.jpg        （相对 assets/ 目录）
+            #   - Sveltia CMS: /assets/images/foo.jpg  （绝对路径，media_folder）
+            # 统一归一化成相对 assets/ 的路径，如 covers/foo.jpg 或 images/foo.jpg
+            c = p["cover"].strip()
+            if c.startswith("/assets/"):
+                c = c[len("/assets/"):]
+            elif c.startswith("assets/"):
+                c = c[len("assets/"):]
+            # 去掉可能的开头的 ./ 或 / 
+            c = c.lstrip("./")
+            src = ASSETS / c
             if src.exists():
-                dst = DIST / "assets" / Path(p["cover"]).parent
+                dst = DIST / "assets" / Path(c).parent
                 dst.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst / src.name)
-                p["cover_resolved"] = f'assets/{Path(p["cover"]).as_posix()}'
+                p["cover_resolved"] = f'assets/{Path(c).as_posix()}'
 
     avatar = ""
     if site.get("author_avatar"):
@@ -656,9 +667,17 @@ def build() -> None:
         # 正文里的配图路径：Markdown 里写 covers/xxx.jpg（相对 assets/），
         # 这里按页面层级补上前缀，保证 file:// 打开也不失效
         body_html = re.sub(
-            r'(<img[^>]+src=")(?!https?:|//|/|\.\./)([^"]+)"',
+            r'(<img[^>]+src=")(?!https?:|//|\.\./)([^"]+)"',
             r'\g<1>../assets/\g<2>"',
             p["body"],
+        )
+        # Sveltia CMS 上传的正文图会写成绝对路径 /assets/images/xxx.jpg，
+        # 站点若部署在子路径下（如 GitHub Pages /engine-notes-cms/）绝对 /assets/
+        # 会指向域名根而 404。详情页位于 posts/ 下，这里统一转成 ../assets/… 相对路径。
+        body_html = re.sub(
+            r'(<img[^>]+src=")/assets/([^"]+)"',
+            r'\g<1>../assets/\g<2>"',
+            body_html,
         )
 
         post_body = render(
