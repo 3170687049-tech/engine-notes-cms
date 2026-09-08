@@ -545,12 +545,6 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 .post__body img + p,
 .post__body table + p,
 .post__body p:first-of-type { text-indent: 0; }
-/* 首字下沉：仅作用于 body 内的第一个段落（首段不缩进所以可叠放下沉） */
-.post__body > p:first-of-type::first-letter {
-  font-family: var(--serif);
-  font-size: 2.6em; line-height: 1; font-weight: 700;
-  float: left; margin: 0.08em 0.12em 0 -0.04em; color: var(--accent);
-}
 .post__body h2 {
   font-family: var(--serif); font-size: 26px; margin: 2.2em 0 .8em; font-weight: 700;
   padding-left: 16px; border-left: 4px solid var(--accent); line-height: 1.35;
