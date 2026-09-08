@@ -6,10 +6,12 @@ on:
     branches: [main]
     paths:
       - 'content/**'
+      - 'posts/**'
       - 'templates/**'
       - 'assets/**'
       - 'admin/**'
       - 'build.py'
+      - 'requirements.txt'
       - 'site.yaml'
       - '.github/workflows/deploy.yml'
   # 允许手动触发（用于首次启用 / 调试）
