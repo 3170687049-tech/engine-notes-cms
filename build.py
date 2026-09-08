@@ -571,7 +571,7 @@ def build() -> None:
             ROWS_FLAT="",
         )
         write_text(
-            DIST / "brands" / f"{quote(b)}.html",
+            DIST / "brands" / f"{b}.html",
             page(body, f"{b} · {site['title']}", "", "../"),
         )
 
@@ -587,7 +587,7 @@ def build() -> None:
             ROWS_FLAT="",
         )
         write_text(
-            DIST / "tags" / f"{quote(t)}.html",
+            DIST / "tags" / f"{t}.html",
             page(body, f"#{t} · {site['title']}", "", "../"),
         )
 
@@ -700,7 +700,7 @@ def build() -> None:
             ensure_ascii=False,
         )
         write_text(
-            DIST / "posts" / f"{quote(p['slug'])}.html",
+            DIST / "posts" / f"{p['slug']}.html",
             page(
                 post_body,
                 f'{p["title"]} · {site["title"]}',
