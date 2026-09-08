@@ -1,0 +1,90 @@
+<section class="page-head">
+  <div class="wrap compose__head">
+    <div>
+      <p class="kicker">Compose · 撰稿</p>
+      <h1 class="page-title">写一篇评测</h1>
+      <p class="page-sub">左侧填元数据 · 中间写正文（Markdown，支持工具栏）· 右侧实时预览</p>
+    </div>
+    <div class="compose__head-aside">
+      <button id="draftBtn" class="btn btn--ghost" type="button">保存草稿</button>
+      <button id="exportBtn" class="btn" type="button">导出 .md</button>
+      <button id="clearBtn" class="btn btn--ghost btn--danger" type="button">清空</button>
+    </div>
+  </div>
+</section>
+
+<section class="wrap compose">
+  <!-- 左：元数据 -->
+  <aside class="compose__meta">
+    <h3 class="compose__h">元数据</h3>
+    <label class="field"><span>标题</span><input id="f-title" type="text" placeholder="例：特斯拉焕新版 Model Y 后驱标准版"></label>
+    <label class="field"><span>Slug</span><input id="f-slug" type="text" placeholder="tesla-model-y-standard-rwd（小写，连字符）"></label>
+    <label class="field"><span>发布日期</span><input id="f-date" type="date"></label>
+    <label class="field"><span>作者</span><input id="f-author" type="text" value="Wesley Lin"></label>
+    <label class="field"><span>品牌</span><input id="f-brand" type="text" placeholder="例：特斯拉"></label>
+    <label class="field"><span>车型</span><input id="f-model" type="text" placeholder="例：Model Y 焕新版"></label>
+    <label class="field"><span>栏目</span>
+      <select id="f-category">
+        <option value="评测">评测</option>
+        <option value="长测">长测</option>
+        <option value="对比">对比</option>
+        <option value="游记">游记</option>
+        <option value="杂谈">杂谈</option>
+      </select>
+    </label>
+    <label class="field"><span>标签（逗号分隔）</span><input id="f-tags" type="text" placeholder="特斯拉, 纯电, SUV"></label>
+    <label class="field"><span>评分（满分 10，留空不显示）</span><input id="f-score" type="number" min="0" max="10" step="0.1"></label>
+    <label class="field"><span>封面图路径</span><input id="f-cover" type="text" placeholder="covers/xxx.jpg"></label>
+    <label class="field"><span>试驾车来源（选填）</span><input id="f-loan" type="text" placeholder="厂商提供 / 自费 / 租赁"></label>
+    <label class="field"><span>摘要（一段话）</span><textarea id="f-excerpt" rows="3" placeholder="首页和文章页会显示，留空则自动取正文前 200 字"></textarea></label>
+
+    <h3 class="compose__h compose__h--top">评分维度</h3>
+    <div class="compose__bars">
+      <label class="bar-row"><span>动力</span><input id="r-power" type="number" min="0" max="10" step="0.1"></label>
+      <label class="bar-row"><span>操控</span><input id="r-handling" type="number" min="0" max="10" step="0.1"></label>
+      <label class="bar-row"><span>舒适</span><input id="r-comfort" type="number" min="0" max="10" step="0.1"></label>
+      <label class="bar-row"><span>内饰</span><input id="r-interior" type="number" min="0" max="10" step="0.1"></label>
+      <label class="bar-row"><span>智能</span><input id="r-smart" type="number" min="0" max="10" step="0.1"></label>
+      <label class="bar-row"><span>性价比</span><input id="r-value" type="number" min="0" max="10" step="0.1"></label>
+    </div>
+
+    <h3 class="compose__h compose__h--top">草稿列表</h3>
+    <ul id="draftList" class="compose__drafts"></ul>
+  </aside>
+
+  <!-- 中：编辑器 -->
+  <main class="compose__edit">
+    <div class="toolbar-compose" role="toolbar" aria-label="格式工具栏">
+      <button type="button" data-wrap="**" title="加粗"><b>B</b></button>
+      <button type="button" data-wrap="*" title="斜体"><i>I</i></button>
+      <button type="button" data-prefix="## " title="二级标题">H2</button>
+      <button type="button" data-prefix="### " title="三级标题">H3</button>
+      <button type="button" data-prefix="#### " title="四级标题">H4</button>
+      <span class="tb-sep"></span>
+      <button type="button" data-wrap="`" title="行内代码"><code>&lt;/&gt;</code></button>
+      <button type="button" data-prefix="> " title="引用">❝</button>
+      <button type="button" data-prefix="- " title="无序列表">•</button>
+      <button type="button" data-prefix="1. " title="有序列表">1.</button>
+      <span class="tb-sep"></span>
+      <button type="button" data-insert="[链接文字](https://)" title="链接">🔗</button>
+      <button type="button" data-insert="![配图说明](covers/your-image.jpg)" title="插入图片">🖼</button>
+      <button type="button" data-insert="\n\n---\n\n" title="分割线">—</button>
+      <button type="button" data-insert="| 列1 | 列2 |\n| --- | --- |\n| 内容 | 内容 |\n" title="表格">⊞</button>
+      <span class="tb-sep"></span>
+      <button type="button" id="tbImgUpload" title="上传图片（转 data URL）">↑图</button>
+      <input id="imgFile" type="file" accept="image/*" hidden>
+    </div>
+    <textarea id="editor" class="compose__textarea" placeholder="开始写……&#10;&#10;工具栏插入 Markdown 语法；右侧实时预览。&#10;&#10;## 小标题&#10;首段无缩进，标题后段落自动不缩进。&#10;&#10;正文段落会在中文排版里自动首行缩进 2 字符。"></textarea>
+    <p class="compose__hint">导出后请把 .md 文件放进 <code>content/</code>，封面图放进 <code>assets/covers/</code>，然后 <code>python3 build.py</code> 重建并 deploy。本页所有内容仅保存在浏览器本地（localStorage），不会上传到服务器。</p>
+  </main>
+
+  <!-- 右：预览 -->
+  <aside class="compose__prev">
+    <h3 class="compose__h">实时预览</h3>
+    <div class="compose__prevtitle" id="prevTitle">（标题）</div>
+    <div class="compose__prevdeck" id="prevDeck">（摘要）</div>
+    <article id="preview" class="post__body compose__prevbody"></article>
+  </aside>
+</section>
+
+<script src="assets/compose.js" defer></script>

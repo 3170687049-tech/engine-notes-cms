@@ -1,0 +1,45 @@
+<article class="post">
+  <div class="progress" aria-hidden="true"><i></i></div>
+
+  <header class="wrap post__head">
+    <p class="kicker">{{KICKER}}</p>
+    <h1 class="post__title">{{TITLE}}</h1>
+    <p class="post__deck">{{EXCERPT}}</p>
+    <div class="byline">
+      <span class="byline__who">文 / {{AUTHOR}}</span>
+      <span>{{DATE}}</span>
+      <span>{{MINUTES}} 分钟 · 约 {{WORDS}} 字</span>
+      <a class="byline__brand" href="{{BRAND_HREF}}"># {{BRAND}}</a>
+    </div>
+  </header>
+
+  <figure class="post__cover">{{COVER}}</figure>
+
+  <div class="wrap post__grid">
+    <aside class="post__side">
+      {{SCORECARD}}
+      {{SPEC}}
+      {{VERDICT_BOX}}
+      {{TOC_BOX}}
+    </aside>
+
+    <div class="post__body">
+      {{BODY}}
+      <footer class="post__foot">
+        <div class="post__tags">{{TAGS}}</div>
+        <p class="post__disclaimer">本文为作者独立完成的主观评测，未收取任何厂商费用；所有体验基于评测当时的试驾车状态。</p>
+      </footer>
+      <nav class="pn">{{NAV_LINKS}}</nav>
+    </div>
+  </div>
+
+  <section class="wrap related">
+    <h2 class="sec-title">延伸阅读</h2>
+    <div class="grid grid--three">
+{{RELATED}}
+    </div>
+  </section>
+</article>
+
+<button class="totop" id="totop" aria-label="回到顶部">↑</button>
+<div class="lightbox" id="lightbox" hidden><img alt=""></div>

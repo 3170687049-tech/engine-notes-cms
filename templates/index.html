@@ -1,0 +1,80 @@
+{{HERO}}
+
+<section class="stats">
+  <div class="wrap stats__in">
+    <div class="stat"><b>{{TOTAL}}</b><em>篇评测</em></div>
+    <div class="stat"><b>{{STAT_BRANDS}}</b><em>个品牌</em></div>
+    <div class="stat"><b>{{STAT_YEARS}}</b><em>年记录</em></div>
+    <div class="stat"><b>{{STAT_WORDS}}</b><em>万字手稿</em></div>
+    <div class="stat stat--sig">署名 / <b>{{AUTHOR}}</b></div>
+  </div>
+</section>
+
+<section class="listing" id="listing">
+  <div class="wrap">
+    <div class="listing__head">
+      <h2 class="sec-title">全部手稿</h2>
+      <div class="toolbar">
+        <div class="search">
+          <input id="q" type="search" autocomplete="off" placeholder="搜索车型、品牌或关键词…">
+          <kbd>/</kbd>
+          <div class="search__pop" id="pop" hidden></div>
+        </div>
+        <select id="sort" aria-label="排序方式">
+          <option value="date">最新发表</option>
+          <option value="score">评分最高</option>
+          <option value="year">按年份</option>
+        </select>
+        <p class="count" id="count">共 {{TOTAL}} 篇</p>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filter-row">
+        <span class="filter-row__k">品牌</span>
+        <div class="chips" data-group="brand">{{CHIPS_BRAND}}</div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-row__k">栏目</span>
+        <div class="chips" data-group="cat">{{CHIPS_CAT}}</div>
+      </div>
+    </div>
+
+    <div class="grid" id="grid">
+{{CARDS}}
+    </div>
+    <p class="noresult" id="noresult" hidden>没有符合条件的文章，换个词试试。</p>
+  </div>
+</section>
+
+<aside class="panels">
+  <div class="wrap panels__in">
+{{RANK_PANEL}}
+
+    <section class="panel">
+      <h3 class="panel__t">最近更新 <span>Latest</span></h3>
+      <ul class="latest">
+{{LATEST_LIST}}
+      </ul>
+      <a class="panel__more" href="archive.html">按年份查看全部 →</a>
+    </section>
+
+    <section class="panel panel--wide">
+      <h3 class="panel__t">品牌索引 <span>Index</span></h3>
+      <div class="pills">
+{{BRAND_LIST}}
+      </div>
+    </section>
+
+    <section class="panel panel--author">
+      <div class="avatar">
+        {{AVATAR_BLOCK}}
+      </div>
+      <div>
+        <h3 class="panel__t">{{AUTHOR}} <span>Author</span></h3>
+        <p class="author__bio">{{AUTHOR_BIO}}</p>
+        <a class="panel__more" href="about.html">关于我 →</a>
+      </div>
+    </section>
+  </div>
+</aside>

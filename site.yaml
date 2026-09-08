@@ -1,0 +1,38 @@
+# ============================================================
+# 站点配置 —— 你只需要改这一个文件就能把它变成「你的」站
+# ============================================================
+
+title: "引擎笔记"
+subtitle: "ENGINE NOTES"          # 刊徽副标题，通常是英文期刊名
+tagline: "一个车评人的全部手稿"
+
+# 你的署名（改成你的笔名 / 真名）
+author: "Wesley Lin"
+author_bio: "开了很多车，写了很多字。只聊开起来什么样，不聊参数表上写什么。"
+author_avatar: ""                 # 可选：填 assets/ 下的头像文件名，留空则使用默认字标
+
+# 每期刊号 & 出版信息（纯装饰，随意改）
+since_year: 2019
+issue_label: "第 07 期"
+
+# 导航
+nav:
+  - { label: "全部文章", href: "archive.html" }
+  - { label: "撰稿",   href: "compose.html" }
+  - { label: "关于我",   href: "about.html" }
+
+# 社交 / 联系方式（留空则不显示）
+links:
+  - { label: "微博", url: "https://weibo.com/u/2174005494" }
+  - { label: "视频号", url: "https://weixin.qq.com" }
+  - { label: "邮箱", url: "mailto:hello@example.com" }
+
+# 首页首屏推荐位：填 slug，留空则自动取最新一篇 featured / 最新文章
+featured_slug: ""
+
+# 评分维度说明（文章页悬停可见）
+rating_hint: "满分 10 分，仅代表本人在这台车所属价位与定位下的主观判断。"
+
+# 生成 RSS / 部署相关
+base_url: "https://d1af8371bc3d4dbfaee107a5f2d3d9a7.app.workbuddy.link"
+rss: true
