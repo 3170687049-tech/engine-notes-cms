@@ -136,6 +136,7 @@
                 },
                 { label: '综合评分', name: 'score', widget: 'number', value_type: 'float', min: 0, max: 10, step: 0.1, required: false },
                 { label: '封面图', name: 'cover', widget: 'image', required: false },
+                { label: '封面焦点(纵) 0~100', name: 'coverPos', hint: '0=显示画面最上方 / 50=居中(默认偏上22) / 100=最下方。裁切固定比例时用来让主体(车)不被切掉。', widget: 'number', value_type: 'int', min: 0, max: 100, required: false },
                 { label: '试驾车来源', name: 'loan', widget: 'string', required: false },
                 { label: '摘要', name: 'excerpt', widget: 'text', required: false },
                 { label: '一句话结论', name: 'verdict', widget: 'string', required: false },
