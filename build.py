@@ -124,6 +124,7 @@ def parse_post(path: Path) -> dict | None:
         "score": score,
         "cover": str(meta.get("cover") or "").strip(),
         "cover_alt": str(meta.get("cover_alt") or "").strip(),
+        "cover_pos": str(meta.get("coverPos") or meta.get("cover_pos") or "").strip(),
         "featured": bool(meta.get("featured")),
         "draft": bool(meta.get("draft")),
         "body": body_html,
@@ -144,9 +145,22 @@ def cover_block(post: dict, mod: str = "", prefix: str = "") -> str:
     """封面：有真实照片用照片，没有则生成排版封面（永远不会开天窗）。"""
     if post.get("cover_resolved"):
         alt = post.get("cover_alt") or post["title"]
+        pos = post.get("cover_pos", "")
+        # coverPos: 0-100 垂直焦点百分比；存进 CSS 变量，供 object-position 使用
+        focus = ""
+        if pos:
+            pct = None
+            try:
+                v = float(pos)
+                if 0 <= v <= 100:
+                    pct = v
+            except ValueError:
+                pass
+            if pct is not None:
+                focus = f' style="--coverpos:center {pct:.0f}%"'
         return (
             f'<figure class="cover cover--photo {mod}">'
-            f'<img src="{prefix}{post["cover_resolved"]}" alt="{html_lib.escape(alt)}" loading="lazy">'
+            f'<img src="{prefix}{post["cover_resolved"]}" alt="{html_lib.escape(alt)}" loading="lazy"{focus}>'
             f"</figure>"
         )
     h = hue(post["slug"] + post["brand"])
@@ -659,9 +673,10 @@ def build() -> None:
             )
 
         # 正文里的配图路径：Markdown 里写 covers/xxx.jpg（相对 assets/），
-        # 这里按页面层级补上前缀，保证 file:// 打开也不失效
+        # 这里按页面层级补上前缀，保证 file:// 打开也不失效。
+        # 排除协议(http/https)、//、/ 或 ../ 开头的外链/绝对路径，只补相对路径。
         body_html = re.sub(
-            r'(<img[^>]+src=")(?!https?:|//|\.\./)([^"]+)"',
+            r'(<img[^>]+src=")(?!https?:|//|/|\.\./)([^"]+)"',
             r'\g<1>../assets/\g<2>"',
             p["body"],
         )
