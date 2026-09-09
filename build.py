@@ -658,12 +658,6 @@ def build() -> None:
                 f'<p class="verdict__t">{html_lib.escape(p["verdict"])}</p></div>'
             )
 
-        toc_box = (
-            f'<details class="tocbox" open><summary>本文目录</summary>{p["toc"]}</details>'
-            if p["toc"].strip()
-            else ""
-        )
-
         # 正文里的配图路径：Markdown 里写 covers/xxx.jpg（相对 assets/），
         # 这里按页面层级补上前缀，保证 file:// 打开也不失效
         body_html = re.sub(
@@ -693,7 +687,6 @@ def build() -> None:
             SCORECARD=scorecard,
             SPEC=spec_table(p["spec"]),
             VERDICT_BOX=verdict_box,
-            TOC_BOX=toc_box,
             BODY=body_html,
             TAGS=tag_links,
             BRAND=p["brand"],
