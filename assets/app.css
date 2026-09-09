@@ -226,7 +226,10 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 
 /* ---------- 封面 ---------- */
 .cover { margin: 0; position: relative; overflow: hidden; background: #EFEBE3; }
-.cover--photo img { width: 100%; height: 100%; object-fit: cover; }
+/* 裁切焦点默认偏上(20%)：车评封面主体(车身/车头)通常在中上部，
+   居中(50%)很容易把车头裁掉。每篇文章可用 frontmatter 的 coverPos 单独微调
+   （0=最上 … 50=居中 … 100=最下），build 时输出内联 object-position 覆盖。 */
+.cover--photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--coverpos, center 22%); }
 .cover--photo { aspect-ratio: 3 / 2; }
 
 .cover--type {
