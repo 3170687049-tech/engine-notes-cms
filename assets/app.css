@@ -507,13 +507,6 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 .verdict__k { font-family: var(--sans); font-size: 10px; letter-spacing: .24em; color: var(--accent-ink); margin: 0 0 6px; text-transform: uppercase; }
 .verdict__t { font-family: var(--serif); font-size: 16px; line-height: 1.7; margin: 0; }
 
-.tocbox { border: 1px solid var(--rule); background: #fff; padding: 14px 16px; font-family: var(--sans); font-size: 12.5px; }
-.tocbox summary { cursor: pointer; letter-spacing: .1em; color: var(--ink-3); font-size: 11px; }
-.tocbox ul { list-style: none; margin: 10px 0 0; padding: 0; }
-.tocbox li { padding: 3px 0; }
-.tocbox a { color: var(--ink-2); }
-.tocbox a:hover { color: var(--accent); }
-
 .post__body { 
   max-width: 720px; 
   text-align: justify;
@@ -532,6 +525,10 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
   text-autospace: normal;
   -webkit-text-autospace: normal;
 }
+/* 图片应居中显示、不缩进、不参与段落行高 */
+.post__body p:has(> img:only-child) {
+  text-indent: 0; text-align: center; margin: 2.2em 0;
+}
 /* 首段、标题后、引用/列表/图片后接的段落：不缩进（避免视觉冗余） */
 .post__body p:first-child,
 .post__body h2 + p,
@@ -546,30 +543,47 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 .post__body table + p,
 .post__body p:first-of-type { text-indent: 0; }
 .post__body h2 {
-  font-family: var(--serif); font-size: 26px; margin: 2.2em 0 .8em; font-weight: 700;
-  padding-left: 16px; border-left: 4px solid var(--accent); line-height: 1.35;
+  font-family: var(--serif); font-size: 26px; margin: 2.6em 0 .8em; font-weight: 700;
+  padding-left: 16px; border-left: 4px solid var(--accent); line-height: 1.4;
   letter-spacing: 0.02em;
 }
-.post__body h3 { font-family: var(--serif); font-size: 20px; margin: 1.8em 0 .6em; font-weight: 700; letter-spacing: 0.02em; }
-.post__body h4 { font-family: var(--serif); font-size: 17px; margin: 1.6em 0 .5em; font-weight: 700; color: var(--ink-2); }
-.post__body ul, .post__body ol { font-family: var(--sans); font-size: 16px; line-height: 1.9; margin: 0 0 1.4em; padding-left: 1.3em; color: var(--ink-2); }
-.post__body li { margin-bottom: .4em; }
+.post__body h3 {
+  font-family: var(--serif); font-size: 20px; margin: 2.2em 0 .7em; font-weight: 700;
+  letter-spacing: 0.02em; color: var(--ink);
+}
+.post__body h4 { font-family: var(--serif); font-size: 17px; margin: 1.9em 0 .55em; font-weight: 700; color: var(--ink-2); }
+.post__body ul, .post__body ol { font-family: var(--sans); font-size: 17px; line-height: 2.0; margin: 0 0 1.5em; padding-left: 1.5em; color: var(--ink); }
+.post__body li { margin-bottom: .5em; }
 .post__body li::marker { color: var(--accent); }
 /* 引用：取消首行缩进（已是视觉独立块）+ 内部段落也不缩进 */
 .post__body blockquote {
-  margin: 2em 0; padding: 20px 24px; background: var(--highlight); border-left: 3px solid var(--ink);
-  font-size: 18px; line-height: 1.95; color: var(--ink); text-indent: 0;
+  margin: 2.2em 0; padding: 22px 26px; background: var(--highlight); border-left: 3px solid var(--accent);
+  font-size: 18px; line-height: 2.0; color: var(--ink); text-indent: 0;
+  border-radius: 2px;
 }
 .post__body blockquote p { text-indent: 0; margin: 0 0 .8em; }
 .post__body blockquote p:last-child { margin: 0; }
-.post__body hr { border: 0; text-align: center; margin: 2.6em 0; }
+.post__body hr { border: 0; text-align: center; margin: 3em 0; }
 .post__body hr::before { content: "· · ·"; letter-spacing: .8em; color: var(--rule-2); font-size: 20px; }
-.post__body strong { font-weight: 700; }
-.post__body img { margin: 2em 0; border: 1px solid var(--rule); }
+.post__body strong { font-weight: 700; color: var(--ink); }
+/* 正文配图：居中、可点开大图、去边框圆角柔和 */
+.post__body img {
+  display: inline-block; max-width: 100%; height: auto;
+  margin: 0; border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+/* 图片下方说明文字（独立成段、仅一个 <em> 的段）→ 小号、居中、浅灰、不缩进 */
+.post__body p:has(> em:only-child) { text-indent: 0; margin: -0.2em 0 1.8em; }
+.post__body p > em:only-child {
+  font-style: normal; background: none;
+  display: block; text-align: center; font-size: 13px; line-height: 1.7;
+  color: var(--ink-3); letter-spacing: .04em;
+}
+/* 正文内普通强调（行内 em，非图片说明）→ 保持轻微高亮 */
 .post__body em { font-style: normal; background: linear-gradient(transparent 62%, var(--highlight) 62%); }
 /* 图片下方若有 figcaption / 上一段是图，段落不缩进 */
 .post__body figure + p,
 .post__body figure + p { text-indent: 0; }
+
 
 .post__foot { margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--rule); }
 .post__tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
