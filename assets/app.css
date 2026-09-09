@@ -226,10 +226,11 @@ button { font: inherit; cursor: pointer; border: 0; background: none; color: inh
 
 /* ---------- 封面 ---------- */
 .cover { margin: 0; position: relative; overflow: hidden; background: #EFEBE3; }
-/* 裁切焦点默认偏上(20%)：车评封面主体(车身/车头)通常在中上部，
-   居中(50%)很容易把车头裁掉。每篇文章可用 frontmatter 的 coverPos 单独微调
-   （0=最上 … 50=居中 … 100=最下），build 时输出内联 object-position 覆盖。 */
-.cover--photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--coverpos, center 22%); }
+/* 取景焦点：左右 X + 上下 Y 两个可调值（0-100%），解决长图裁切。
+   默认偏上(22%)：车评封面主体(车身/车头)通常在中上部，居中(50%)易裁掉车头。
+   每篇可用 frontmatter 的 coverX(左右) / coverY(上下) 单独微调；
+   旧 coverPos 仅调纵向，build 时转成 coverY。build 输出内联变量覆盖默认。 */
+.cover--photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--coverx, 50%) var(--covery, 22%); }
 .cover--photo { aspect-ratio: 3 / 2; }
 
 .cover--type {

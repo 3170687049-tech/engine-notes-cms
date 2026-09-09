@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>封面取景器 · 引擎笔记</title>
+<meta name="robots" content="noindex" />
+<style>
+  * { box-sizing: border-box; }
+  :root{
+    --bg:#f7f5f0; --card:#ffffff; --ink:#1f1c19; --ink2:#5f5e5a; --line:#e7e2d9;
+    --accent:#bf2c0a; --accent-d:#9c2308; --ok:#3b6d11;
+  }
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 20px 60px;}
+  .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .top h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.01em;}
+  .top h1 small{color:var(--ink2);font-size:13px;font-weight:400;margin-left:10px;}
+  .top .back a{color:var(--accent);text-decoration:none;font-size:13px;font-weight:500;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px;}
+  .card > h2{font-size:14px;margin:0 0 12px;color:var(--ink2);font-weight:600;}
+  .loadrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 14px;
+    font-size:13px;cursor:pointer;font-family:inherit;}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+  .btn.primary:hover{background:var(--accent-d);}
+  .btn:hover{border-color:#cfc8bb;}
+  input[type=text].url{flex:1;min-width:220px;border:1px solid var(--line);border-radius:9px;padding:8px 12px;
+    font-size:13px;font-family:inherit;color:var(--ink);}
+  input[type=text].url:focus{outline:none;border-color:var(--accent);}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;}
+  .seg label{cursor:pointer;}
+  .seg input{display:none;}
+  .seg span{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:13px;color:var(--ink2);}
+  .seg input:checked + span{background:#fdeeea;border-color:var(--accent);color:var(--accent);font-weight:600;}
+  .stage{display:grid;grid-template-columns:1.25fr .9fr;gap:18px;}
+  @media (max-width:820px){.stage{grid-template-columns:1fr;}}
+  canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;
+    background:repeating-conic-gradient(#efede6 0 25%,#e6e3da 0 50%) 0 0/24px 24px;touch-action:none;cursor:grab;}
+  canvas.drag{cursor:grabbing;}
+  .hint{font-size:12px;color:var(--ink2);margin-top:8px;line-height:1.7;}
+  .hint b{color:var(--accent);font-weight:600;}
+  .previewbox{position:relative;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#000;}
+  .previewbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .ratio-tag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;
+    padding:2px 8px;border-radius:6px;z-index:2;}
+  .vals{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  .val{flex:1;min-width:170px;}
+  .val label{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-bottom:6px;}
+  .val label output{font-family:ui-monospace,Menlo,monospace;font-weight:700;color:var(--accent);}
+  .val input[type=range]{width:100%;accent-color:var(--accent);}
+  .axis-tip{font-size:11px;color:var(--ok);margin-top:2px;min-height:16px;}
+  .output{margin-top:14px;background:#f4f1ea;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    font-family:ui-monospace,Menlo,monospace;font-size:13px;word-break:break-all;line-height:1.8;}
+  .output b{font-weight:700;}
+  .copyrow{display:flex;gap:8px;align-items:center;margin-top:10px;}
+  .copied{color:var(--ok);font-size:12px;display:none;}
+  .how{font-size:13px;color:var(--ink2);line-height:1.9;margin-top:16px;background:#fbfaf6;border:1px dashed #d8d1c2;
+    border-radius:10px;padding:12px 14px;}
+  .how b{color:var(--ink);}
+  .empty{color:var(--ink2);font-size:13px;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>封面取景器<small>给长图选保留画面，生成左右 / 上下焦点数值</small></h1>
+    <div class="back"><a href="../index.html">&larr; 返回站点</a></div>
+  </div>
+
+  <div class="card">
+    <h2>1 · 载入封面图</h2>
+    <div class="loadrow">
+      <label class="btn primary" for="file">选择本地图片</label>
+      <input type="file" id="file" accept="image/*" hidden />
+      <span style="color:var(--ink2);font-size:12px;">或粘贴线上封面 URL：</span>
+      <input type="text" class="url" id="url" placeholder="https://3170687049-tech.github.io/engine-notes-cms/assets/images/xxxx.jpg" />
+      <button class="btn" id="loadUrl">载入</button>
+    </div>
+    <p class="empty" id="ph" style="margin:12px 0 0;">尚未载入图片。</p>
+  </div>
+
+  <div class="card">
+    <h2>2 · 选展示比例（决定从哪里裁）</h2>
+    <div class="seg" id="ratioSeg">
+      <label><input type="radio" name="ratio" value="1.5" checked /><span>文章卡片 · 3:2</span></label>
+      <label><input type="radio" name="ratio" value="1.7778" /><span>文章顶部大图 · 16:9</span></label>
+      <label><input type="radio" name="ratio" value="1.3333" /><span>首页轮播 · 4:3</span></label>
+    </div>
+  </div>
+
+  <div class="card" id="stageCard" style="display:none;">
+    <h2>3 · 拖动取景区对准主体，右侧实时预览</h2>
+    <div class="stage">
+      <div class="srcwrap">
+        <canvas id="cv"></canvas>
+        <p class="hint">灰色压暗的部分会在最终封面里被裁掉。拖动亮区让 <b>车身 / 车头</b> 完整落在亮区里；只在可动方向移动（某方向不裁时会自动锁定）。</p>
+      </div>
+      <div>
+        <div class="previewbox" id="pv" style="aspect-ratio:1.5;">
+          <span class="ratio-tag" id="pvTag">3:2 预览</span>
+          <img id="pvImg" alt="裁切预览" />
+        </div>
+        <div class="vals">
+          <div class="val">
+            <label>左右焦点 X <output id="outX">50</output></label>
+            <input type="range" id="slX" min="0" max="100" value="50" />
+            <p class="axis-tip" id="tipX"></p>
+          </div>
+          <div class="val">
+            <label>上下焦点 Y <output id="outY">22</output></label>
+            <input type="range" id="slY" min="0" max="100" value="22" />
+            <p class="axis-tip" id="tipY"></p>
+          </div>
+        </div>
+        <button class="btn" id="reset" style="margin-top:4px;">重置为默认（X 50 / Y 22）</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="outCard" style="display:none;">
+    <h2>4 · 生成的数值（填回 CMS）</h2>
+    <div class="output" id="code"></div>
+    <div class="copyrow">
+      <button class="btn primary" id="copy">复制 coverX / coverY 数值</button>
+      <span class="copied" id="copied">已复制 ✓</span>
+    </div>
+    <div class="how">
+      <b>怎么用：</b>载入封面 → 选它主要展示的位置比例 → 拖动取景区对准车的主体或车头 → 记下 / 复制右侧 X、Y → 回到后台把“封面焦点·左右 X”“封面焦点·上下 Y”两个数字填进这篇文章（封面图字段下方）→ 保存。网页会用这两个值精确控制裁切，主体不再被切掉。
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const cv=$('cv'), ctx=cv.getContext('2d');
+  const pv=$('pv'), pvImg=$('pvImg'), pvTag=$('pvTag');
+  const outX=$('outX'), outY=$('outY'), slX=$('slX'), slY=$('slY');
+  const tipX=$('tipX'), tipY=$('tipY');
+
+  let img=null;
+  let ratio=1.5;
+  let fx=0.5, fy=0.22;
+  let canX=true, canY=false;
+  let dragging=false;
+
+  const DEFAULT_X=50, DEFAULT_Y=22;
+
+  function showImg(src){
+    const im=new Image();
+    im.crossOrigin='anonymous';
+    im.onload=()=>{ img=im; fx=DEFAULT_X/100; fy=DEFAULT_Y/100;
+      $('stageCard').style.display=''; $('outCard').style.display='';
+      $('ph').textContent=im.naturalWidth+' × '+im.naturalHeight+' 已载入。拖动左侧亮区对准主体。';
+      draw();
+    };
+    im.onerror=()=>{ $('ph').textContent='图片载入失败：请确认 URL 在浏览器能直接打开（若站点了防盗链会拦截）。'; };
+    im.src=src;
+  }
+
+  // 原图自然尺寸 W×H；容器规范化 宽=ratio 高=1。cover 下露出的原图子矩形(sw×sh)。
+  function geom(){
+    const W=img.naturalWidth, H=img.naturalHeight;
+    const scale=Math.max(ratio/W, 1/H);
+    const sw=ratio/scale, sh=1/scale;
+    return {W,H,sw,sh, canX:sw<W-0.5, canY:sh<H-0.5};
+  }
+  function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+  // 焦点 -> 子矩形中心（原图像素）
+  function centerOf(g, xx, yy){
+    let cx, cy;
+    if(g.canX){ cx=(g.W-g.sw)*clamp01(xx)+g.sw/2; } else { cx=g.W/2; }
+    if(g.canY){ cy=(g.H-g.sh)*clamp01(yy)+g.sh/2; } else { cy=g.H/2; }
+    return {cx,cy};
+  }
+
+  function draw(){
+    if(!img) return;
+    const g=geom(); canX=g.canX; canY=g.canY;
+    const maxDim=1500;
+    let dw=img.naturalWidth, dh=img.naturalHeight;
+    const big=Math.max(dw,dh);
+    if(big>maxDim){ const s=maxDim/big; dw=Math.round(dw*s); dh=Math.round(dh*s); }
+    if(cv.width!==dw||cv.height!==dh){ cv.width=dw; cv.height=dh; }
+    const sc=Math.min(dw/img.naturalWidth, dh/img.naturalHeight); // contain 显示缩放
+    const ox=(dw-img.naturalWidth*sc)/2, oy=(dh-img.naturalHeight*sc)/2;
+
+    ctx.clearRect(0,0,dw,dh);
+    ctx.fillStyle='#eceae3'; ctx.fillRect(0,0,dw,dh);
+    ctx.drawImage(img, ox,oy, img.naturalWidth*sc, img.naturalHeight*sc);
+
+    const c=centerOf(g,fx,fy);
+    const bw=g.sw*sc, bh=g.sh*sc;              // 亮区画布宽高
+    const bxc=ox+c.cx*sc, byc=oy+c.cy*sc;      // 亮区中心
+    const bx=bxc-bw/2, by=byc-bh/2;
+
+    // 压暗取景区外
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0,0,dw,dh);
+    ctx.rect(bx,by,bw,bh);
+    ctx.fillStyle='rgba(18,15,12,0.52)';
+    ctx.fill('evenodd');
+    // 亮框
+    ctx.lineWidth=Math.max(1.5,dw/420); ctx.strokeStyle='#fff';
+    ctx.strokeRect(bx,by,bw,bh);
+    ctx.restore();
+
+    // 中心十字（只在对应方向可动时画整十字，否则只画可动方向虚线提示）
+    ctx.save();
+    ctx.lineWidth=Math.max(1, dw/650); ctx.strokeStyle='rgba(255,255,255,0.95)';
+    const arm=Math.max(12, dw/90);
+    if(g.canX){ ctx.beginPath(); ctx.moveTo(bxc-arm,byc); ctx.lineTo(bxc+arm,byc); ctx.stroke(); }
+    if(g.canY){ ctx.beginPath(); ctx.moveTo(bxc,byc-arm); ctx.lineTo(bxc,byc+arm); ctx.stroke(); }
+    ctx.restore();
+
+    updateControls(g);
+  }
+
+  function updateControls(g){
+    const px=g.canX? Math.round(fx*100) : DEFAULT_X;
+    const py=g.canY? Math.round(fy*100) : DEFAULT_Y;
+    pv.style.aspectRatio=ratio+' / 1';
+    pvImg.style.objectPosition=px+'% '+py+'%';
+    outX.textContent=px; outY.textContent=py;
+    slX.value=px; slY.value=py;
+    tipX.textContent=g.canX? '可左右平移 · X='+px : '左右不裁切（画面整幅显示），X 固定';
+    tipY.textContent=g.canY? '可上下平移 · Y='+py : '上下不裁切（整高可见），Y 固定';
+    if(!g.canY && !g.canX){ tipY.textContent='图片比例与展示比例一致，完全不裁切'; }
+    const rlab=(Math.abs(ratio-1.5)<0.01)?'3:2':(Math.abs(ratio-1.7778)<0.01)?'16:9':(Math.abs(ratio-1.3333)<0.01)?'4:3':ratio.toFixed(2);
+    pvTag.textContent=rlab+' 预览';
+    $('code').innerHTML='填到 CMS：<b>封面焦点·左右 X</b> = '+px+'，<b>封面焦点·上下 Y</b> = '+py;
+  }
+
+  // 画布指针 -> 焦点
+  function focusFromPointer(xCanvas,yCanvas){
+    const g=geom();
+    const sc=Math.min(cv.width/img.naturalWidth, cv.height/img.naturalHeight);
+    const ox=(cv.width-img.naturalWidth*sc)/2, oy=(cv.height-img.naturalHeight*sc)/2;
+    const pxImg=(xCanvas-ox)/sc, pyImg=(yCanvas-oy)/sc;
+    if(g.canX){ fx=clamp01((pxImg-g.sw/2)/(g.W-g.sw)); }
+    if(g.canY){ fy=clamp01((pyImg-g.sh/2)/(g.H-g.sh)); }
+    draw();
+  }
+  function pt(e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height)}; }
+  cv.addEventListener('pointerdown',e=>{ if(!img) return; dragging=true; cv.classList.add('drag'); const p=pt(e); focusFromPointer(p.x,p.y); });
+  cv.addEventListener('pointermove',e=>{ if(!dragging||!img) return; const p=pt(e); focusFromPointer(p.x,p.y); });
+  window.addEventListener('pointerup',()=>{ dragging=false; cv.classList.remove('drag'); });
+  cv.addEventListener('pointercancel',()=>{ dragging=false; cv.classList.remove('drag'); });
+
+  slX.addEventListener('input',()=>{ fx=slX.value/100; draw(); });
+  slY.addEventListener('input',()=>{ fy=slY.value/100; draw(); });
+  $('reset').addEventListener('click',()=>{ fx=DEFAULT_X/100; fy=DEFAULT_Y/100; draw(); });
+
+  document.querySelectorAll('input[name=ratio]').forEach(r=>r.addEventListener('change',e=>{
+    ratio=parseFloat(e.target.value); draw();
+  }));
+
+  $('file').addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const rd=new FileReader(); rd.onload=()=>showImg(rd.result); rd.readAsDataURL(f);
+    e.target.value='';
+  });
+  $('loadUrl').addEventListener('click',()=>{ const v=$('url').value.trim(); if(v) showImg(v); });
+  $('url').addEventListener('keydown',e=>{ if(e.key==='Enter') $('loadUrl').click(); });
+
+  $('copy').addEventListener('click',()=>{
+    const g=geom();
+    const px=g.canX?Math.round(fx*100):DEFAULT_X;
+    const py=g.canY?Math.round(fy*100):DEFAULT_Y;
+    const ta=document.createElement('textarea'); ta.value='coverX: '+px+'  coverY: '+py; document.body.appendChild(ta); ta.select();
+    try{document.execCommand('copy');}catch(_){}
+    ta.remove();
+    const c=$('copied'); c.style.display='inline'; setTimeout(()=>{c.style.display='none';},2000);
+  });
+})();
+</script>
+</body>
+</html>

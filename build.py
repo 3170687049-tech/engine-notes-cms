@@ -124,7 +124,15 @@ def parse_post(path: Path) -> dict | None:
         "score": score,
         "cover": str(meta.get("cover") or "").strip(),
         "cover_alt": str(meta.get("cover_alt") or "").strip(),
-        "cover_pos": str(meta.get("coverPos") or meta.get("cover_pos") or "").strip(),
+        # 取景焦点(0-100)：coverX=左右, coverY=上下。旧 coverPos 只调纵向，回退到 coverY
+        "cover_x": str(meta.get("coverX") or meta.get("cover_x") or "").strip(),
+        "cover_y": str(
+            meta.get("coverY")
+            or meta.get("cover_y")
+            or meta.get("coverPos")
+            or meta.get("cover_pos")
+            or ""
+        ).strip(),
         "featured": bool(meta.get("featured")),
         "draft": bool(meta.get("draft")),
         "body": body_html,
@@ -141,23 +149,33 @@ def hue(s: str) -> int:
     return int(hashlib.md5(s.encode("utf-8")).hexdigest()[:6], 16) % 360
 
 
+def _focus_pct(raw: str):
+    """把 frontmatter 里的 0-100 数值解析成合法的 CSS 百分比字符串；非法返回 None。"""
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    try:
+        v = float(raw)
+    except ValueError:
+        return None
+    if not (0 <= v <= 100):
+        return None
+    return f"{round(v):d}%"
+
+
 def cover_block(post: dict, mod: str = "", prefix: str = "") -> str:
     """封面：有真实照片用照片，没有则生成排版封面（永远不会开天窗）。"""
     if post.get("cover_resolved"):
         alt = post.get("cover_alt") or post["title"]
-        pos = post.get("cover_pos", "")
-        # coverPos: 0-100 垂直焦点百分比；存进 CSS 变量，供 object-position 使用
-        focus = ""
-        if pos:
-            pct = None
-            try:
-                v = float(pos)
-                if 0 <= v <= 100:
-                    pct = v
-            except ValueError:
-                pass
-            if pct is not None:
-                focus = f' style="--coverpos:center {pct:.0f}%"'
+        # 取景焦点：左右 coverX + 上下 coverY（均 0-100）。只内联合法值，缺省走 CSS 默认
+        cx = _focus_pct(post.get("cover_x"))
+        cy = _focus_pct(post.get("cover_y"))
+        vars_ = []
+        if cx is not None:
+            vars_.append(f"--coverx:{cx}")
+        if cy is not None:
+            vars_.append(f"--covery:{cy}")
+        focus = f' style="{" ".join(vars_)}"' if vars_ else ""
         return (
             f'<figure class="cover cover--photo {mod}">'
             f'<img src="{prefix}{post["cover_resolved"]}" alt="{html_lib.escape(alt)}" loading="lazy"{focus}>'
@@ -419,6 +437,11 @@ def build() -> None:
     admin_src = ROOT / "admin"
     if admin_src.exists():
         shutil.copytree(admin_src, DIST / "admin")
+
+    # 独立小工具页（如 tools/cover-crop.html 封面取景器）
+    tools_src = ROOT / "tools"
+    if tools_src.exists():
+        shutil.copytree(tools_src, DIST / "tools")
 
     for p in posts:
         if p["cover"]:
